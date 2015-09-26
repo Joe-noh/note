@@ -10,8 +10,6 @@ defmodule Note.UserView do
   end
 
   def render("user.json", %{user: user}) do
-    %{id: user.id,
-      name: user.name,
-      digest: user.digest}
+    %{id: user.id, name: user.name}
   end
 end

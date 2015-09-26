@@ -19,9 +19,7 @@ defmodule Note.UserControllerTest do
   test "shows chosen resource", %{conn: conn} do
     user = Repo.insert! %User{}
     conn = get conn, user_path(conn, :show, user)
-    assert json_response(conn, 200)["data"] == %{"id" => user.id,
-      "name" => user.name,
-      "digest" => user.digest}
+    assert json_response(conn, 200)["data"] == %{"id" => user.id, "name" => user.name}
   end
 
   test "does not show resource and instead throw error when id is nonexistent", %{conn: conn} do
