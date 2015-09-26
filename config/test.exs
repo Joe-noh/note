@@ -21,3 +21,5 @@ config :note, Note.Repo,
   hostname: "192.168.99.100",
   port: 32768,
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :comeonin, bcrypt_log_rounds: 4
