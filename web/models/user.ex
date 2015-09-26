@@ -1,6 +1,9 @@
 defmodule Note.User do
   use Note.Web, :model
 
+  alias Note.User
+  alias Note.Repo
+
   schema "users" do
     field :name, :string
     field :digest, :string
@@ -14,19 +17,20 @@ defmodule Note.User do
   @required_fields ~w(name password)
   @optional_fields ~w()
 
-  @doc """
-  Creates a changeset based on the `model` and `params`.
-
-  If no params are provided, an invalid changeset is returned
-  with no validation performed.
-  """
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
 
-  defp digest(password) do
-    Comeonin.Bcrypt.hashpwsalt(password)
+  def authenticate(name, password) do
+    case Repo.get_by(User, name: name) do
+      nil  -> Comeonin.Bcrypt.dummy_checkpw()
+      user -> do_authenticate(user, password)
+    end
+  end
+
+  defp do_authenticate(user, password) do
+    if Comeonin.Bcrypt.checkpw(password, user.digest), do: user
   end
 
   def generate_digest(conn) do
@@ -35,5 +39,9 @@ defmodule Note.User do
     else
       conn
     end
+  end
+
+  defp digest(password) do
+    Comeonin.Bcrypt.hashpwsalt(password)
   end
 end
