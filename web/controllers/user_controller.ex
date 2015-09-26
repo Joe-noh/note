@@ -26,12 +26,22 @@ defmodule Note.UserController do
     end
   end
 
+  def create(conn, _params) do
+    changeset = User.changeset(%User{}, %{})
+
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(Note.ChangesetView, "error.json", changeset: changeset)
+  end
+
   def show(conn, %{"id" => id}) do
     user = Repo.get!(User, id)
     render conn, "show.json", user: user
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
+    user_params = Map.drop(user_params, ["digest"])
+
     user = Repo.get!(User, id)
     changeset = User.changeset(user, user_params)
 
@@ -47,9 +57,6 @@ defmodule Note.UserController do
 
   def delete(conn, %{"id" => id}) do
     user = Repo.get!(User, id)
-
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
     Repo.delete!(user)
 
     send_resp(conn, :no_content, "")

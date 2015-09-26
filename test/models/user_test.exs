@@ -3,7 +3,7 @@ defmodule Note.UserTest do
 
   alias Note.User
 
-  @valid_attrs %{digest: "some content", name: "some content"}
+  @valid_attrs %{password: "my_secret_password", name: "John Doe"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

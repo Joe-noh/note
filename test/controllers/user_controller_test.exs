@@ -2,7 +2,8 @@ defmodule Note.UserControllerTest do
   use Note.ConnCase
 
   alias Note.User
-  @valid_attrs %{digest: "some content", name: "some content"}
+
+  @valid_attrs %{password: "my_secret_password", name: "John Doe"}
   @invalid_attrs %{}
 
   setup do
@@ -32,7 +33,7 @@ defmodule Note.UserControllerTest do
   test "creates and renders resource when data is valid", %{conn: conn} do
     conn = post conn, user_path(conn, :create), user: @valid_attrs
     assert json_response(conn, 201)["data"]["id"]
-    assert Repo.get_by(User, @valid_attrs)
+    assert Repo.get_by(User, name: @valid_attrs[:name])
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
@@ -44,7 +45,7 @@ defmodule Note.UserControllerTest do
     user = Repo.insert! %User{}
     conn = put conn, user_path(conn, :update, user), user: @valid_attrs
     assert json_response(conn, 200)["data"]["id"]
-    assert Repo.get_by(User, @valid_attrs)
+    assert Repo.get_by(User, name: @valid_attrs[:name])
   end
 
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
