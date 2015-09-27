@@ -24,7 +24,7 @@ defmodule Note.Router do
   scope "/", Note do
     pipe_through :browser # Use the default browser stack
 
-    get "/", PageController, :index
+    get "/", HomeController, :index
   end
 
   scope "/api", Note do

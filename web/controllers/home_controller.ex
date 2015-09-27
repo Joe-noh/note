@@ -1,4 +1,4 @@
-defmodule Note.PageController do
+defmodule Note.HomeController do
   use Note.Web, :controller
 
   def index(conn, _params) do
