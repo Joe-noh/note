@@ -7,14 +7,14 @@ defmodule Note.SessionController do
 
   def create(conn, %{"session" => %{"name" => name, "password" => password}}) do
     case User.authenticate(name, password) do
-      nil  -> unauthorized(conn)
-      user -> authorized(conn, user)
+      nil  -> unauthenticated(conn)
+      user -> authenticated(conn, user)
     end
   end
 
-  def create(conn, _params), do: unauthorized(conn)
+  def create(conn, _params), do: unauthenticated(conn)
 
-  defp authorized(conn, user) do
+  defp authenticated(conn, user) do
     {:ok, token, _claims} = Guardian.encode_and_sign(user, :token)
 
     conn
@@ -22,7 +22,7 @@ defmodule Note.SessionController do
     |> render("auth.json", user: user, token: token)
   end
 
-  defp unauthorized(conn) do
+  def unauthenticated(conn, _params \\ []) do
     conn
     |> put_status(:unauthorized)
     |> render(Note.ErrorView, "401.json")
