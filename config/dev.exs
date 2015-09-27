@@ -41,12 +41,3 @@ config :note, Note.Repo,
   hostname: "192.168.99.100",
   port: 32768,
   pool_size: 10
-
-config :joken, config_module: Guardian.JWT
-
-config :guardian, Guardian,
-  issuer: "Note",
-  ttl: {30, :days},
-  verify_issuer: true,
-  secret_key: "guardian_secret_key",
-  serializer: Note.GuardianSerializer
