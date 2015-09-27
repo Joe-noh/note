@@ -16,7 +16,10 @@ config :phoenix, :stacktrace_depth, 20
 config :note, Note.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
-  password: "postgres",
+  password: "",
   database: "note_test",
-  hostname: "localhost",
+  hostname: "192.168.99.100",
+  port: 32768,
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :comeonin, bcrypt_log_rounds: 4

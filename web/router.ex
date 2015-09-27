@@ -11,6 +11,14 @@ defmodule Note.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug Guardian.Plug.VerifyHeader
+    plug Guardian.Plug.LoadResource, key: :current_user
+    plug Guardian.Plug.EnsureAuthenticated,
+      on_failure: {Note.SessionController, :unauthenticated}
+  end
+
+  pipeline :api_without_auth do
+    plug :accepts, ["json"]
   end
 
   scope "/", Note do
@@ -19,8 +27,16 @@ defmodule Note.Router do
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", Note do
-  #   pipe_through :api
-  # end
+  scope "/api", Note do
+    pipe_through :api
+
+    resources "/users", UserController, only: [:show, :update, :delete]
+  end
+
+  scope "/api", Note do
+    pipe_through :api_without_auth
+
+    resources "/users", UserController, only: [:create]
+    post   "/login",  SessionController, :create
+  end
 end

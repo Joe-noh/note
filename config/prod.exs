@@ -59,3 +59,11 @@ config :logger, level: :info
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
 import_config "prod.secret.exs"
+
+config :guardian, Guardian,
+  issuer: "Note",
+  ttl: {30, :days},
+  verify_issuer: true,
+  secret_key: System.get_env("SECRET_KEY_BASE"),
+  serializer: Note.GuardianSerializer
+
