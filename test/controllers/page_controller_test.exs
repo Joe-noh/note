@@ -22,7 +22,7 @@ defmodule Note.PageControllerTest do
     {:ok, conn: conn, user: user, page: page}
   end
 
-  test "lists all entries on index", %{conn: conn, user: user} do
+  test "index returns all pages of the user", %{conn: conn, user: user} do
     conn = get conn, user_page_path(conn, :index, user)
     response = json_response(conn, 200)["data"]
 

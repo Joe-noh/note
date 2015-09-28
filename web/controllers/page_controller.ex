@@ -6,7 +6,7 @@ defmodule Note.PageController do
   plug :scrub_params, "page" when action in [:create, :update]
 
   def index(conn, _params) do
-    pages = Repo.all(Page)
+    pages = Repo.all(assoc conn.assigns.current_user, :pages)
     render(conn, "index.json", pages: pages)
   end
 
