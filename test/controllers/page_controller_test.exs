@@ -24,7 +24,7 @@ defmodule Note.PageControllerTest do
 
   test "index returns all pages of the user", %{conn: conn, user: user} do
     conn = get(conn, user_page_path(conn, :index, user))
-    response = json_response(conn, 200)["data"]
+    response = json_response(conn, 200)["pages"]
 
     assert Enum.count(response) == Enum.count(Repo.preload(user, :pages).pages)
   end
@@ -38,11 +38,10 @@ defmodule Note.PageControllerTest do
   test "show returns a page", %{conn: conn, user: user, page: page} do
     conn = get(conn, user_page_path(conn, :show, user, page))
 
-    assert json_response(conn, 200)["data"] == %{
-      "id" => page.id,
+    assert json_response(conn, 200)["page"] == %{
+      "id"    => page.id,
       "title" => page.title,
-      "body" => page.body,
-      "user_id" => page.user_id
+      "body"  => page.body
     }
   end
 
@@ -62,7 +61,7 @@ defmodule Note.PageControllerTest do
     page_params = %{title: "Another One", body: "Hey!"}
     conn = post(conn, user_page_path(conn, :create, user), page: page_params)
 
-    assert json_response(conn, 201)["data"]["id"]
+    assert json_response(conn, 201)["page"]["id"]
     assert Repo.get_by(Page, page_params)
   end
 
@@ -83,7 +82,7 @@ defmodule Note.PageControllerTest do
     page_params = %{title: "Another One", body: "Hey!"}
     conn = put(conn, user_page_path(conn, :update, user, page), page: page_params)
 
-    assert json_response(conn, 200)["data"]["id"]
+    assert json_response(conn, 200)["page"]["id"]
     assert Repo.get_by(Page, page_params)
   end
 
