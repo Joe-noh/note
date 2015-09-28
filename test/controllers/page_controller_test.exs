@@ -19,18 +19,24 @@ defmodule Note.PageControllerTest do
     conn_without_token = conn |> put_req_header("accept", "application/json")
     conn = conn_without_token |> put_req_header("authorization", token)
 
-    {:ok, conn: conn, user: user, page: page}
+    {:ok, conn: conn, conn_without_token: conn_without_token, user: user, page: page}
   end
 
   test "index returns all pages of the user", %{conn: conn, user: user} do
-    conn = get conn, user_page_path(conn, :index, user)
+    conn = get(conn, user_page_path(conn, :index, user))
     response = json_response(conn, 200)["data"]
 
     assert Enum.count(response) == Enum.count(Repo.preload(user, :pages).pages)
   end
 
+  test "index returns 401 if the token is missing", %{conn_without_token: conn, user: user} do
+    conn = get(conn, user_page_path(conn, :index, user))
+
+    assert json_response(conn, 401)["errors"]
+  end
+
   test "shows chosen resource", %{conn: conn, user: user, page: page} do
-    conn = get conn, user_page_path(conn, :show, user, page)
+    conn = get(conn, user_page_path(conn, :show, user, page))
 
     assert json_response(conn, 200)["data"] == %{
       "id" => page.id,
@@ -40,17 +46,31 @@ defmodule Note.PageControllerTest do
     }
   end
 
+  test "show returns 401 if the token is missing", %{conn_without_token: conn, user: user, page: page} do
+    conn = get(conn, user_page_path(conn, :show, user, page))
+
+    assert json_response(conn, 401)["errors"]
+  end
+
   test "does not show resource and instead throw error when id is nonexistent", %{conn: conn, user: user} do
     assert_raise Ecto.NoResultsError, fn ->
-      get conn, user_page_path(conn, :show, user, -1)
+      get(conn, user_page_path(conn, :show, user, -1))
     end
   end
 
   test "creates and renders resource when data is valid", %{conn: conn, user: user} do
     page_params = %{title: "Another One", body: "Hey!"}
-    conn = post conn, user_page_path(conn, :create, user), page: page_params
+    conn = post(conn, user_page_path(conn, :create, user), page: page_params)
+
     assert json_response(conn, 201)["data"]["id"]
     assert Repo.get_by(Page, page_params)
+  end
+
+  test "create returns 401 if the token is missing", %{conn_without_token: conn, user: user} do
+    page_params = %{title: "Another One", body: "Hey!"}
+    conn = post(conn, user_page_path(conn, :create, user), page: page_params)
+
+    assert json_response(conn, 401)["errors"]
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn, user: user} do
@@ -65,6 +85,13 @@ defmodule Note.PageControllerTest do
     assert Repo.get_by(Page, page_params)
   end
 
+  test "update returns 401 if the token is missing", %{conn_without_token: conn, user: user, page: page} do
+    page_params = %{title: "Another One", body: "Hey!"}
+    conn = put(conn, user_page_path(conn, :update, user, page), page: page_params)
+
+    assert json_response(conn, 401)["errors"]
+  end
+
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn, user: user, page: page} do
     conn = put conn, user_page_path(conn, :update, user, page), page: @invalid_attrs
     assert json_response(conn, 422)["errors"] != %{}
@@ -74,5 +101,11 @@ defmodule Note.PageControllerTest do
     conn = delete conn, user_page_path(conn, :delete, user, page)
     assert response(conn, 204)
     refute Repo.get(Page, page.id)
+  end
+
+  test "delete returns 401 if the token is missing", %{conn_without_token: conn, user: user, page: page} do
+    conn = delete(conn, user_page_path(conn, :delete, user, page))
+
+    assert json_response(conn, 401)["errors"]
   end
 end
