@@ -6,25 +6,32 @@ defmodule Note.PageControllerTest do
   alias Note.Repo
 
   @valid_attrs %{body: "some content", title: "some content"}
-  @invalid_attrs %{}
+  @invalid_attrs %{body: nil, title: nil}
 
   @user_attrs %{name: "John Doe", password: "password"}
 
   setup do
     user = User.changeset(%User{}, @user_attrs) |> Repo.insert!
-    conn = conn() |> put_req_header("accept", "application/json")
+    page = Ecto.Model.build(user, :pages, @valid_attrs) |> Repo.insert!
 
-    {:ok, conn: conn, user: user}
+    {:ok, token, _claims} = Guardian.encode_and_sign(user, :token)
+
+    conn_without_token = conn |> put_req_header("accept", "application/json")
+    conn = conn_without_token |> put_req_header("authorization", token)
+
+    {:ok, conn: conn, user: user, page: page}
   end
 
   test "lists all entries on index", %{conn: conn, user: user} do
     conn = get conn, user_page_path(conn, :index, user)
-    assert json_response(conn, 200)["data"] == []
+    response = json_response(conn, 200)["data"]
+
+    assert Enum.count(response) == Enum.count(Repo.preload(user, :pages).pages)
   end
 
-  test "shows chosen resource", %{conn: conn, user: user} do
-    page = Repo.insert! %Page{user_id: user.id}
+  test "shows chosen resource", %{conn: conn, user: user, page: page} do
     conn = get conn, user_page_path(conn, :show, user, page)
+
     assert json_response(conn, 200)["data"] == %{
       "id" => page.id,
       "title" => page.title,
@@ -40,9 +47,10 @@ defmodule Note.PageControllerTest do
   end
 
   test "creates and renders resource when data is valid", %{conn: conn, user: user} do
-    conn = post conn, user_page_path(conn, :create, user), page: @valid_attrs
+    page_params = %{title: "Another One", body: "Hey!"}
+    conn = post conn, user_page_path(conn, :create, user), page: page_params
     assert json_response(conn, 201)["data"]["id"]
-    assert Repo.get_by(Page, @valid_attrs)
+    assert Repo.get_by(Page, page_params)
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn, user: user} do
@@ -50,21 +58,19 @@ defmodule Note.PageControllerTest do
     assert json_response(conn, 422)["errors"] != %{}
   end
 
-  test "updates and renders chosen resource when data is valid", %{conn: conn, user: user} do
-    page = Repo.insert! %Page{}
-    conn = put conn, user_page_path(conn, :update, user, page), page: @valid_attrs
+  test "updates and renders chosen resource when data is valid", %{conn: conn, user: user, page: page} do
+    page_params = %{title: "Another One", body: "Hey!"}
+    conn = put conn, user_page_path(conn, :update, user, page), page: page_params
     assert json_response(conn, 200)["data"]["id"]
-    assert Repo.get_by(Page, @valid_attrs)
+    assert Repo.get_by(Page, page_params)
   end
 
-  test "does not update chosen resource and renders errors when data is invalid", %{conn: conn, user: user} do
-    page = Repo.insert! %Page{}
+  test "does not update chosen resource and renders errors when data is invalid", %{conn: conn, user: user, page: page} do
     conn = put conn, user_page_path(conn, :update, user, page), page: @invalid_attrs
     assert json_response(conn, 422)["errors"] != %{}
   end
 
-  test "deletes chosen resource", %{conn: conn, user: user} do
-    page = Repo.insert! %Page{}
+  test "deletes chosen resource", %{conn: conn, user: user, page: page} do
     conn = delete conn, user_page_path(conn, :delete, user, page)
     assert response(conn, 204)
     refute Repo.get(Page, page.id)

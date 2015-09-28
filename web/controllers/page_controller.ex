@@ -6,14 +6,14 @@ defmodule Note.PageController do
   plug :scrub_params, "page" when action in [:create, :update]
 
   def index(conn, _params) do
-    IO.inspect conn
     pages = Repo.all(Page)
     render(conn, "index.json", pages: pages)
   end
 
   def create(conn, %{"page" => page_params}) do
-    IO.inspect conn
-    changeset = Page.changeset(%Page{}, page_params)
+    changeset = conn.assigns.current_user
+      |> Ecto.Model.build(:pages)
+      |> Page.changeset(page_params)
 
     case Repo.insert(changeset) do
       {:ok, page} ->
@@ -34,8 +34,7 @@ defmodule Note.PageController do
   end
 
   def update(conn, %{"id" => id, "page" => page_params}) do
-    page = Repo.get!(Page, id)
-    changeset = Page.changeset(page, page_params)
+    changeset = Repo.get!(Page, id) |> Page.changeset(page_params)
 
     case Repo.update(changeset) do
       {:ok, page} ->
@@ -48,11 +47,7 @@ defmodule Note.PageController do
   end
 
   def delete(conn, %{"id" => id}) do
-    page = Repo.get!(Page, id)
-
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
-    Repo.delete!(page)
+    Repo.get!(Page, id) |> Repo.delete!
 
     send_resp(conn, :no_content, "")
   end
