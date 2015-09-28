@@ -1,6 +1,10 @@
 defmodule Note.Router do
   use Note.Web, :router
 
+  defp assign_current_user(conn, _opts) do
+    Plug.Conn.assign(conn, :current_user, Guardian.Plug.current_resource(conn))
+  end
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -12,7 +16,8 @@ defmodule Note.Router do
   pipeline :api do
     plug :accepts, ["json"]
     plug Guardian.Plug.VerifyHeader
-    plug Guardian.Plug.LoadResource, key: :current_user
+    plug Guardian.Plug.LoadResource
+    plug :assign_current_user
     plug Guardian.Plug.EnsureAuthenticated,
       on_failure: {Note.SessionController, :unauthenticated}
   end
@@ -30,13 +35,15 @@ defmodule Note.Router do
   scope "/api", Note do
     pipe_through :api
 
-    resources "/users", UserController, only: [:show, :update, :delete]
+    resources "/users", UserController, only: [:show, :update, :delete] do
+      resources "/pages", PageController, except: [:new, :edit]
+    end
   end
 
   scope "/api", Note do
     pipe_through :api_without_auth
 
     resources "/users", UserController, only: [:create]
-    post   "/login",  SessionController, :create
+    post "/login",  SessionController, :create
   end
 end

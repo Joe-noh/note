@@ -2,6 +2,7 @@ defmodule Note.User do
   use Note.Web, :model
 
   alias Note.User
+  alias Note.Page
   alias Note.Repo
 
   schema "users" do
@@ -10,6 +11,8 @@ defmodule Note.User do
     field :password, :string, virtual: true
 
     timestamps
+
+    has_many :pages, Page
   end
 
   before_insert __MODULE__, :generate_digest
