@@ -19,7 +19,7 @@ defmodule Note.PageController do
       {:ok, page} ->
         conn
         |> put_status(:created)
-        |> put_resp_header("location", user_page_path(conn, :show, page,conn.assigns.current_user))
+        |> put_resp_header("location", page_path(conn, :show, page))
         |> render("show.json", page: page)
       {:error, changeset} ->
         conn

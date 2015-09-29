@@ -35,9 +35,8 @@ defmodule Note.Router do
   scope "/api", Note do
     pipe_through :api
 
-    resources "/users", UserController, only: [:show, :update, :delete] do
-      resources "/pages", PageController, except: [:new, :edit]
-    end
+    resources "/users", UserController, only: [:show, :update, :delete]
+    resources "/pages", PageController, except: [:new, :edit]
   end
 
   scope "/api", Note do
