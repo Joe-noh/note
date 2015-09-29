@@ -4,7 +4,7 @@ defmodule Note.Repo.Migrations.CreatePage do
   def change do
     create table(:pages) do
       add :title,   :string
-      add :body,    :string
+      add :body,    :text
       add :user_id, references(:users), null: false
 
       timestamps

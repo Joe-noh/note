@@ -7,7 +7,7 @@ defmodule Note.UserControllerTest do
   @invalid_attrs %{}
 
   setup do
-    user = User.changeset(%User{}, @valid_attrs) |> Repo.insert!
+    user = Forge.saved_user(Repo) #User.changeset(%User{}, @valid_attrs) |> Repo.insert!
     {:ok, token, _claims} = Guardian.encode_and_sign(user, :token)
 
     conn_without_token = conn |> put_req_header("accept", "application/json")

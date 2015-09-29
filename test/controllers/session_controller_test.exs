@@ -1,16 +1,12 @@
 defmodule Note.SessionControllerTest do
   use Note.ConnCase
 
-  alias Note.User
-
   @valid_attrs  %{name: "John Doe", password: "password"}
   @invalid_attrs %{}
 
-  @user_params @valid_attrs
-
   setup do
     conn = conn() |> put_req_header("accept", "application/json")
-    user = User.changeset(%User{}, @user_params) |> Repo.insert!
+    user = Forge.saved_user(Repo)
     {:ok, %{conn: conn, user: user}}
   end
 
