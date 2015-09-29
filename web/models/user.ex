@@ -44,7 +44,7 @@ defmodule Note.User do
     end
   end
 
-  defp digest(password) do
+  def digest(password) do
     Comeonin.Bcrypt.hashpwsalt(password)
   end
 end

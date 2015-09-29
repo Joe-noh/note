@@ -2,17 +2,13 @@ defmodule Note.PageControllerTest do
   use Note.ConnCase
 
   alias Note.Page
-  alias Note.User
   alias Note.Repo
 
-  @valid_attrs %{body: "some content", title: "some content"}
   @invalid_attrs %{body: nil, title: nil}
 
-  @user_attrs %{name: "John Doe", password: "password"}
-
   setup do
-    user = User.changeset(%User{}, @user_attrs) |> Repo.insert!
-    page = Ecto.Model.build(user, :pages, @valid_attrs) |> Repo.insert!
+    user = Forge.saved_user(Repo)
+    page = Forge.saved_page(Repo, user_id: user.id)
 
     {:ok, token, _claims} = Guardian.encode_and_sign(user, :token)
 
