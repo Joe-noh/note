@@ -12,5 +12,5 @@ React.render(
       </Route>
     </Router>
   ),
-  document.body
+  document.getElementById("root")
 );
