@@ -1,10 +1,23 @@
 import React from 'react'
-import {History} from 'react-router'
+import AuthStore from '../stores/AuthStore'
+import AuthActions from '../actions/AuthActions'
 
-import auth from '../libs/auth'
+let Login = React.createClass({
+  getInitialState() {
+    return AuthStore.getState();
+  },
 
-export default React.createClass({
-  mixins: [History],
+  componentDidMount() {
+    AuthStore.listen(this.onChange);
+  },
+
+  componentWillUnmount() {
+    AuthStore.unlisten(this.onChange);
+  },
+
+  onChange(state) {
+    this.setState(state);
+  },
 
   handleOnSubmit(e) {
     e.preventDefault();

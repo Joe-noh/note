@@ -1,8 +1,5 @@
 import React from 'react'
 
-import history from '../libs/history'
-import auth from '../libs/auth'
-
 export default class App extends React.Component {
   constructor(props) {
     super(props);
