@@ -2,9 +2,9 @@
   "repository": {},
   "dependencies": {
     "alt": "^0.17.4",
+    "fetch": "^0.3.6",
     "react": "^0.13.3",
-    "react-router": "^1.0.0-rc1",
-    "superagent": "^1.4.0"
+    "react-router": "^1.0.0-rc1"
   },
   "devDependencies": {
     "babelify": "^6.3.0",
