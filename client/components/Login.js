@@ -25,15 +25,7 @@ let Login = React.createClass({
     let name = this.refs.nameInput.getDOMNode().value;
     let pass = this.refs.passwordInput.getDOMNode().value;
 
-    auth.login(name, pass, (loggedIn) => {
-      var {location} = this.props;
-
-      if (location.state && location.state.nextPathname) {
-        this.history.replaceState(null, location.state.nextPathname);
-      } else {
-        this.history.replaceState(null, '/');
-      }
-    });
+    AuthActions.requestLogin(name, pass);
   },
 
   render() {
@@ -46,3 +38,5 @@ let Login = React.createClass({
     );
   }
 });
+
+export default Login;
