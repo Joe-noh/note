@@ -26,15 +26,21 @@ let Login = React.createClass({
     let pass = this.refs.passwordInput.getDOMNode().value;
 
     AuthActions.requestLogin(name, pass);
+
+    console.log(this.state);
   },
 
   render() {
     return (
-      <form onSubmit={this.handleOnSubmit} >
-        <input type="text" ref="nameInput" placeholder="name" />
-        <input type="password" ref="passwordInput" placeholder="password" />
-        <input type="submit" value="Login" />
-      </form>
+      <div>
+        <form onSubmit={this.handleOnSubmit} >
+          <input type="text" ref="nameInput" placeholder="name" />
+          <input type="password" ref="passwordInput" placeholder="password" />
+          <input type="submit" value="Login" />
+        </form>
+
+        <div>{this.state.loggedIn ? "true" : "false"}</div>
+      </div>
     );
   }
 });

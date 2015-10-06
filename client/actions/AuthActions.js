@@ -1,13 +1,18 @@
 import alt from '../libs/alt'
+import AuthSource from '../sources/AuthSource'
 import WebAPI from '../libs/WebAPI'
 
 class AuthActions {
   requestLogin(name, password) {
-    let dispatcher = this;
+    this.dispatch();
 
-    WebAPI.login(name, password).then((res) => {
-      dispatcher.dispatch(res);
+    AuthSource.login(name, password).then((res) => {
+      this.actions.updateAuth(res);
     });
+  }
+
+  updateAuth(res) {
+    this.dispatch(res);
   }
 }
 
