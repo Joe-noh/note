@@ -1,5 +1,3 @@
-//import fetch from 'fetch'
-
 class WebAPI {
   static login(name, password) {
     return fetch("/api/login", {
